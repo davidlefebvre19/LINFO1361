@@ -22,10 +22,10 @@ class SoftFlow(Problem):
             [0, -1] # Left
         ]
 
-        for i in range(len(state.letter_coords)):
-            init_pos = state.letter_coords[i]
-            #number_possibilities = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
-            #number_possibilities.remove(str(i))
+        for x in range(len(state.letter_coords)):
+            init_pos = state.letter_coords[x]
+            number_possibilities = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
+            number_possibilities.remove(str(x))
             column = init_pos[2]  # y
             row = init_pos[1]  # x
             poss_moves = []
@@ -33,7 +33,7 @@ class SoftFlow(Problem):
             for [i, j] in pos:
                 new_x = row + i
                 new_y = column + j
-                if(state.grid[new_x][new_y] != '#' and state.grid[new_x][new_y] != "1" and state.grid[new_x][new_y] != "0"):
+                if(state.grid[new_x][new_y] != '#' and state.grid[new_x][new_y] not in number_possibilities):
                     poss_moves.append((new_x, new_y))
                     possible_actions[init_pos[0]] = poss_moves
 
