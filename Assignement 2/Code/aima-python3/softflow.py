@@ -13,36 +13,30 @@ class SoftFlow(Problem):
         
     def actions(self, state):
 
-        possible_actions = []
-
-        number_possibilities = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
-        letter_possibilities = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j"]
+        possible_actions = {}
 
         pos = [
             [1, 0], # Down
-            [-1, 0], # Up
+            [-1, 0],# Up
             [0, 1], # Right
             [0, -1] # Left
         ]
 
-        #current_number = 0
-        init_pos = state.letter_coords[0]
-        #for h in range(10):
-        #    if(init_pos[0] == letter_possibilities[h]):
-        #        current_number = number_possibilities[h]
+        for i in range(len(state.letter_coords)):
+            init_pos = state.letter_coords[i]
+            #number_possibilities = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
+            #number_possibilities.remove(str(i))
+            column = init_pos[2]  # y
+            row = init_pos[1]  # x
+            poss_moves = []
 
-        #number_possibilities.remove(current_number)
-        column = init_pos[1] # x
-        row = init_pos[2] # y
-        new_init_pos = [init_pos[1], [init_pos[2]]]
+            for [i, j] in pos:
+                new_x = row + i
+                new_y = column + j
+                if(state.grid[new_x][new_y] != '#' and state.grid[new_x][new_y] != "1" and state.grid[new_x][new_y] != "0"):
+                    poss_moves.append((new_x, new_y))
+                    possible_actions[init_pos[0]] = poss_moves
 
-        for [i, j] in pos:
-            new_x = column + i
-            new_y = row + j
-
-            for w in range(9):
-                if(state.grid[new_y][new_x] != '#' and new_y < len(state.grid) and new_x < len(state.grid[0]) and state.grid[new_y][new_x] != number_possibilities[w]):
-                    possible_actions.append([new_y, new_x, new_init_pos])
         return possible_actions
 
     def result(self, state, action):
@@ -179,14 +173,10 @@ problem.initial.grid_tuple = problem.list_to_tuple(problem.initial.grid)
 
 print_info(problem)
 
-node, explored, frontier = breadth_first_graph_search(problem)
-print(node)
-print(explored)
-print(frontier)
-
+node = astar_search(problem, h=())
 #path = node.path()
 
-#node = astar_search(problem)
+
 
 # example of print
 #path = node.path()
