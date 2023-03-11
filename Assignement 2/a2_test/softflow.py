@@ -21,25 +21,26 @@ class SoftFlow(Problem):
         actions = []
         moves = [[1,0], [-1,0],[0,1],[0,-1]]
         for w, letter in enumerate(state.source_coords):
-            for z in range(moves):
-                new_coord = (state.grid[state.source_coords[w][0]]+moves[z][0], state.grid[state.source_coords[w][1]]+moves[z][1])
-                if ord(state.grid[new_coord[0]][new_coord[1]]) == ord('') or ord(state.grid[new_coord[0]][new_coord[1]]) == ord(w):
-                    actions.append((w,(moves[z])))
+            for [i, j] in moves:
+                new_coord = (state.source_coords[w][0] + i, state.source_coords[w][1]+j)
+                if state.grid[new_coord[0]][new_coord[1]] != '#' or ord(state.grid[new_coord[0]][new_coord[1]]) == ord(str(w)):
+                    actions.append((w,[i, j]))
         yield actions
 
     def result(self, state, action):
         #compute new coords
-        new_coords = (state.source_coords[action[0]][0]+action[1][0], state.source_coords[action[0]][1]+action[1][1])
-        new_grid = [[item.copy() for item in row] for row in state.grid]
-        new_grid[state.source_coords[action[0]][0]][state.source_coords[action[0]][1]] = action[0]
+        new_coords = (state.source_coords[action[0]][0] + action[1][0], state.source_coords[action[0]][1]+action[1][1])
+        new_grid = [x[:] for x in state.grid]
+        #new_grid[state.source_coords[action[0]][0]][state.source_coords[action[0]][1]] = action[0]
         # update element @new_coords
         new_source_coords = state.source_coords.copy()
-        if new_grid[new_coords[0]][new_coords[1]] == ord(''):
+        if new_grid[new_coords[0]][new_coords[1]] == ' ':
             new_grid[new_coords[0]][new_coords[1]] = action[0]
             new_source_coords[action[0]] = new_coords
         else:
             # destnation has been reached
-            del new_source_coords.source_coords[action[0]]
+            new_source_coords.remove(new_source_coords[0])
+            #del new_source_coords.source_coords[action[0]]
         return State(new_grid, new_source_coords)
 
     def goal_test(self, state):
@@ -81,6 +82,9 @@ class SoftFlow(Problem):
 
         letters = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j"]
         letters = letters[:len(source_coords)]
+
+        source_coords.sort(key=lambda x: x[0])
+
         return SoftFlow(state, size, len(letter_possibilities), dest_coords, source_coords, letters)
 
 
@@ -105,7 +109,7 @@ class State:
         return False
 
     def __hash__(self):
-        grid_str = "".join("".join(row) for row in self.grid)
+        grid_str = "".join("".join(str(row)) for row in self.grid)
         return hash(grid_str)
     
     def __lt__(self, other):
@@ -138,8 +142,8 @@ class State:
 # Initial SoftFlow(Problem) object, state has already been initialized from load() func
 problem = SoftFlow.load(sys.argv[1])
 
-heuristic = lambda arg : SoftFlow.h(arg)
-node = astar_search(problem, , True)
+#heuristic = lambda arg : SoftFlow.h(arg)
+node = astar_search(problem, h=())
 
 # example of print
 path = node.path()
