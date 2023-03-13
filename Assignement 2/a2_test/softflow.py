@@ -19,11 +19,12 @@ class SoftFlow(Problem):
         actions = []
         moves = [[1,0], [-1,0],[0,1],[0,-1]]
         for w, letter in enumerate(state.source_coords):
-            for z in range(len(moves)):
-                new_coord = (letter[0]+moves[z][0], letter[1]+moves[z][1])
-                if state.grid[new_coord[0]][new_coord[1]].isspace() or state.grid[new_coord[0]][new_coord[1]] == str(w):
-                    # print((w, (moves[z])))
-                    actions.append((w, (moves[z])))
+            if letter != 'z':
+                for z in range(len(moves)):
+                    new_coord = (letter[0]+moves[z][0], letter[1]+moves[z][1])
+                    if state.grid[new_coord[0]][new_coord[1]].isspace() or state.grid[new_coord[0]][new_coord[1]] == str(w):
+                        # print((w, (moves[z])))
+                        actions.append((w, (moves[z])))
         return actions
 
     def result(self, state, action):
@@ -46,22 +47,24 @@ class SoftFlow(Problem):
         # update element @new_coords
         new_source_coords = state.source_coords.copy()
         new_dest_coords = state.dest_coords.copy()
-        print(new_grid[new_coords[0]][new_coords[1]])
         if new_grid[new_coords[0]][new_coords[1]].isspace():
             print("whitespace")
-            new_grid[new_coords[0]][new_coords[1]] = str(action[0])
+            new_grid[state.source_coords[action[0]][0]][state.source_coords[action[0]][1]] = str(action[0])
+            new_grid[new_coords[0]][new_coords[1]] = self.letters[action[0]]
             new_source_coords[action[0]] = new_coords
         else:
             print("no space here, maybe obj ?")
             print(new_grid[new_coords[0]][new_coords[1]])
             # destnation has been reached
-            print(new_source_coords)
-            new_source_coords[action[0]] = None
+            new_grid[state.source_coords[action[0]][0]][state.source_coords[action[0]][1]] = str(action[0])
+            new_grid[new_coords[0]][new_coords[1]] = str(action[0])
+            new_source_coords[action[0]] = 'z'
+        print(new_source_coords)
         return State(new_grid, new_source_coords, new_dest_coords)
 
     def goal_test(self, state):
         for i in state.source_coords:
-            if i != None:
+            if i != 'z':
                 return False
         return True
 
@@ -69,7 +72,8 @@ class SoftFlow(Problem):
         if node==None: return
         h = 0.0
         for i, source_coord in enumerate(node.state.source_coords):
-            h+= abs(source_coord[0]-self.dest_coords[i][0]) + abs(source_coord[1]-self.dest_coords[i][1])
+            if source_coord != 'z':
+                h+= abs(source_coord[0]-self.dest_coords[i][0]) + abs(source_coord[1]-self.dest_coords[i][1])
         return h
 
 
@@ -142,6 +146,7 @@ class State:
 
     def __hash__(self):
         grid_str = "".join("".join(row) for row in self.grid)
+        source_coords_str = "".join("".join(str(row)) for row in self.grid)
         return hash(grid_str)
 
     def __lt__(self, other):
