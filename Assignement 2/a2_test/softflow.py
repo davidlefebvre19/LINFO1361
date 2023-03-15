@@ -1,5 +1,7 @@
 from search import *
 import copy
+import time
+
 
 #################
 # Problem class #
@@ -7,120 +9,82 @@ import copy
 
 class SoftFlow(Problem):
 
-    def __init__(self, initial, size, nb_letters, dest_coords, source_coords, letters):
-        super().__init__(initial)
-        self.size = size
-        self.nb_letters = nb_letters
-        self.source_coords = source_coords
-        self.dest_coords = dest_coords
-        self.letters = letters
+    def __init__(self, source: dict, dest: dict, hashtag: set):
+        head = {k: v for k, v in source.items()}
+        super().__init__(State(source, set(source.values()), head))
+        self.hashtag = hashtag
+        # My excuses for this
+        numtoalpha = {
+            '0': 'a', '1': 'b', '2': 'c', '3': 'd', '4': 'e',
+            '5': 'f', '6': 'g', '7': 'h', '8': 'i', '9': 'j'}
+        self.target = {numtoalpha[k]: v for k, v in dest.items()}
+        self.dest = {numtoalpha[k]: {(x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)} for k, (x, y) in dest.items()}
 
     def actions(self, state):
-        actions = []
-        moves = [[1,0], [-1,0],[0,1],[0,-1]]
-        for w, letter in enumerate(state.source_coords):
-            if letter != 'z':
-                for z in range(len(moves)):
-                    new_coord = (letter[0]+moves[z][0], letter[1]+moves[z][1])
-                    if state.grid[new_coord[0]][new_coord[1]].isspace() or state.grid[new_coord[0]][new_coord[1]] == str(w):
-                        # print((w, (moves[z])))
-                        actions.append((w, (moves[z])))
-        return actions
+        for k, p in state.sources.items():
+            if p not in self.dest[k]:
+                x, y = p
+
+                up = (x + 1, y)
+                if up not in self.hashtag and not up in state.visited:
+                    yield k, up
+
+                down = (x - 1, y)
+                if down not in self.hashtag and not down in state.visited:
+                    yield k, down
+
+                right = (x, y + 1)
+                if right not in self.hashtag and not right in state.visited:
+                    yield k, right
+
+                left = (x, y - 1)
+                if left not in self.hashtag and not left in state.visited:
+                    yield k, left
 
     def result(self, state, action):
-        if len(action) != 2:
-            print("action value error :")
-            print(action)
-            raise ValueError("action should have two elements")
-
-        if not 0 <= action[0] < len(state.source_coords):
-            raise ValueError("invalid source index in action")
-
-        #compute new coords
-        new_coords = (state.source_coords[action[0]][0]+action[1][0], state.source_coords[action[0]][1]+action[1][1])
-
-        if not (0 <= new_coords[0] < len(state.grid) and 0 <= new_coords[1] < len(state.grid[0])):
-            raise ValueError("new coordinate is out of bounds")
-
-        new_grid = [row[:] for row in state.grid]
-        # new_grid[state.source_coords[action[0]][0]][state.source_coords[action[0]][1]] = action[0]
-        # update element @new_coords
-        new_source_coords = state.source_coords.copy()
-        new_dest_coords = state.dest_coords.copy()
-        if new_grid[new_coords[0]][new_coords[1]].isspace():
-            print("whitespace")
-            new_grid[state.source_coords[action[0]][0]][state.source_coords[action[0]][1]] = str(action[0])
-            new_grid[new_coords[0]][new_coords[1]] = self.letters[action[0]]
-            new_source_coords[action[0]] = new_coords
-        else:
-            print("no space here, maybe obj ?")
-            print(new_grid[new_coords[0]][new_coords[1]])
-            # destnation has been reached
-            new_grid[state.source_coords[action[0]][0]][state.source_coords[action[0]][1]] = str(action[0])
-            new_grid[new_coords[0]][new_coords[1]] = str(action[0])
-            new_source_coords[action[0]] = 'z'
-        print(new_source_coords)
-        return State(new_grid, new_source_coords, new_dest_coords)
+        k, move = action
+        ncoords = {k: v for k, v in state.sources.items()}
+        ncoords[k] = move
+        nvisited = set(state.visited)
+        nvisited.add(move)
+        # nhead = {k: v for k, v in state.head.items()}
+        # nhead[k] = move
+        return State(ncoords, nvisited, move)
 
     def goal_test(self, state):
-        for i in state.source_coords:
-            if i != 'z':
+        for k in state.sources:
+            if state.sources[k] not in self.dest[k]:
                 return False
         return True
 
     def h(self, node=None):
-        if node==None: return
-        h = 0.0
-        for i, source_coord in enumerate(node.state.source_coords):
-            if source_coord != 'z':
-                h+= abs(source_coord[0]-self.dest_coords[i][0]) + abs(source_coord[1]-self.dest_coords[i][1])
-        return h
+        # Manhatan's distance
+        if node==None:
+            return 0
+        x = 0
+        for k, v in node.state.sources.items():
+            source_x, source_y = v
+            target_x, target_y = self.target[k]
+            x += abs(source_x - target_x) + abs(source_y - target_y)
+        node.state.heur = x
+        return x
 
-
-    def load(path):
-        with open(path, 'r') as f:
-            lines = f.readlines()
-
-        lines = [line.rstrip('\n') for line in lines]
-        grid = [[char for char in line] for line in lines]
-
-        unordered_letters = []
-        unordered_numbers = []
-
-        letter_possibilities = set("abcdefghij")
-        number_possibilities = set("0123456789")
-        source_coords = []
-        dest_coords = []
-
-        for w in letter_possibilities:
-            for i, row in enumerate(grid):
-                for j, char in enumerate(row):
-                    if char == w:
-                        unordered_letters.append(w)
-                        source_coords.append((i, j))
-
-        for w in number_possibilities:
-            for i, row in enumerate(grid):
-                for j, char in enumerate(row):
-                    if char == w:
-                        unordered_numbers.append(w)
-                        dest_coords.append((i, j))
-
-        size = (len(grid), len(grid[0]))
-
-        letters = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j"]
-        letters = letters[:len(source_coords)]
-
-        # sort source_coords
-        sorted_letters = sorted(range(len(unordered_letters)), key=lambda i: unordered_letters[i])
-        source_coords = [source_coords[i] for i in sorted_letters]
-        # sort dest_coords
-        sorted_numbers = sorted(range(len(unordered_numbers)), key=lambda i: int(unordered_numbers[i]))
-        # sorted_numbers = [str(x) for x in unordered_numbers]
-        dest_coords = [dest_coords[i] for i in sorted_numbers]
-
-        state = State(grid, source_coords, dest_coords)
-        return SoftFlow(state, size, len(letter_possibilities), dest_coords, source_coords, letters)
+    def load(filename):
+        source = {}
+        dest = {}
+        hashtag = set()
+        with open(filename, 'r') as f:
+            for x, line in enumerate(f.readlines()):
+                for y, char in enumerate(line):
+                    if char == "#":
+                        hashtag.add((x, y))
+                    elif str.isalpha(char):
+                        source[char] = (x, y)
+                    elif str.isnumeric(char):
+                        tmp = (x, y)
+                        dest[char] = tmp
+                        hashtag.add(tmp)
+        return SoftFlow(source, dest, hashtag)
 
 
 ###############
@@ -128,65 +92,70 @@ class SoftFlow(Problem):
 ###############
 
 class State:
-
-    def __init__(self, grid, source_coords, dest_coords):
-        self.nbr = len(grid) # Y upper bound
-        self.nbc = len(grid[0]) # X upper bound
-        self.grid = grid
-        self.source_coords = source_coords
-        self.dest_coords = dest_coords
+    # BIG DEBUG
+    def __init__(self, sources: dict, visited: set, head: dict):
+        self.sources = sources
+        self.visited = visited
+        self.heur = -1
+        self.head = head
 
     def __str__(self):
         return '\n'.join(''.join(row) for row in self.grid)
 
-    def __eq__(self, other_state):
-        if isinstance(other_state, State):
-            return self.grid == other_state.grid
-        return False
+    def __eq__(self, other):
+        return self.sources == other.sources
 
     def __hash__(self):
-        grid_str = "".join("".join(row) for row in self.grid)
-        source_coords_str = "".join("".join(str(row)) for row in self.grid)
-        return hash(grid_str)
+        h = 0
+        for p in self.sources.values():
+            h += hash(p)
+        return h
 
     def __lt__(self, other):
-        return hash(self) < hash(other)
+        return self.heur < other.heur
 
     def from_string(string):
         lines = string.strip().splitlines()
-        grid = list(
+        return State(list(
             map(lambda x: list(x.strip()), lines)
-        )
-        letter_possibilities = set("abcdefghij")
-
-        source_coords = []
-
-        for w in letter_possibilities:
-            for i, row in enumerate(grid):
-                for j, char in enumerate(row):
-                    if char == w:
-                        source_coords.append((i, j))
-
-        return State(grid, source_coords)
-
-
+        ))
 
 
 #####################
 # Launch the search #
 #####################
 
-# Initial SoftFlow(Problem) object, state has already been initialized from load() func
 problem = SoftFlow.load(sys.argv[1])
+# start = time.perf_counter()
+node = astar_search(problem, problem.h(Node()))
+# end = time.perf_counter()
+# print(f"time elasped: {end - start}")
 
-heuristic = lambda arg : SoftFlow.h(arg)
-node = astar_search(problem)
+grid = None
+with open(sys.argv[1], 'r') as f:
+    lines = f.readlines()
+    lines = ''.join(lines)
+    lines = lines.strip().splitlines()
+    grid = list(map(lambda x: list(x.strip()), lines))
 
-# example of print
+translate = {
+    'a': '0', 'b': '1', 'c': '2', 'd': '3', 'e': '4',
+    'f': '5', 'g': '6', 'h': '7', 'i': '8', 'j': '9'}
 path = node.path()
-
 print('Number of moves: ', str(node.depth))
+visited = []
+i = 0
 for n in path:
-    print(n.state)  # assuming that the _str_ function of state outputs the correct format
+    i += 1
+    if visited:
+        for let, coo in visited:
+            x, y = coo
+            grid[x][y] = translate[let]
+    for k, (x, y) in n.state.sources.items():
+        grid[x][y] = k
+        if i == len(path):
+            grid[x][y] = translate[k]
+        visited.append((k, (x, y)))
+    step = '\n'.join(''.join(row) for row in grid)
+    print(step)
     print()
-
