@@ -9,10 +9,11 @@ import time
 
 class SoftFlow(Problem):
 
-    def __init__(self, source: dict, dest: dict, hashtag: set):
+    def __init__(self, source: dict, dest: dict, hashtag: set,nodes = []):
         head = {k: v for k, v in source.items()}
         super().__init__(State(source, set(source.values()), head))
         self.hashtag = hashtag
+        self.nodes = nodes
         # My excuses for this
         numtoalpha = {
             '0': 'a', '1': 'b', '2': 'c', '3': 'd', '4': 'e',
@@ -47,6 +48,7 @@ class SoftFlow(Problem):
         ncoords[k] = move
         nvisited = set(state.visited)
         nvisited.add(move)
+        if(move not in self.nodes): self.nodes.append(move)
         # nhead = {k: v for k, v in state.head.items()}
         # nhead[k] = move
         return State(ncoords, nvisited, move)
@@ -130,7 +132,15 @@ problem = SoftFlow.load(sys.argv[1])
 node = astar_search(problem, problem.h(Node()))
 # end = time.perf_counter()
 # print(f"time elasped: {end - start}")
+''' Réponse question 1 et 2
+matrice = [["x" for _ in range(8)] for _ in range(8)]
 
+
+for i in range(len(problem.nodes)):
+    x, y = problem.nodes[i]
+    matrice[x][y] = i+1
+print(matrice)
+'''
 grid = None
 with open(sys.argv[1], 'r') as f:
     lines = f.readlines()
