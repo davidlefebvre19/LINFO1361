@@ -1,4 +1,4 @@
-# PONTU
+ # PONTU
 The present repository contains the Python code necessary for the LINFO1361 assignment 3.
 
 

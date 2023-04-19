@@ -206,7 +206,7 @@ class PontuState(State):
 
 
     """
-    Check the for presence of bridges adjacent to a specific pawn
+    Check for the presence of bridges adjacent to a specific pawn
      - player is the id of the pawn's player
      - pawn is the id of the pawn
     It returns a dictionary with 4 entries : "EAST", "NORTH", "WEST" or "SOUTH".

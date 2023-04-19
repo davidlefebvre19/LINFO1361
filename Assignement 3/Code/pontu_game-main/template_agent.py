@@ -1,5 +1,7 @@
 from agent import AlphaBetaAgent
 import minimax
+from pontu_state import *
+from pontu_state import PontuState
 
 """
 Agent skeleton. Fill in the gaps.
@@ -20,18 +22,56 @@ class MyAgent(AlphaBetaAgent):
   state s.
   """
   def successors(self, state):
-    pass
+      get_actions = PontuState.get_current_player_actions(state)
+      for moves in get_actions:
+          mov_state = deepcopy(state)
+          PontuState.apply_action(mov_state, moves)
+
+          yield moves, mov_state
+
+
 
   """
   The cutoff function returns true if the alpha-beta/minimax
   search has to stop and false otherwise.
   """
-  def cutoff(self, state, depth):
-    pass
+  def cutoff(self, state: PontuState, depth):
+      if PontuState.game_over(state):
+          return True
+      if depth == 2:
+          return True
+      return False
 
   """
   The evaluate function must return an integer value
   representing the utility function of the board.
   """
-  def evaluate(self, state):
-    pass
+
+
+  def evaluate(self, state: PontuState):
+    # This means that if the current player's ID is 0, then opp_player will be 1, and if the current player's ID is 1, then opp_player will be 0.
+    # opp_player = 0 if current_player == 1 else 1
+    # current_player = state.get_cur_player()
+    # opp_player = 1 - self.id
+
+    # Checks if the current player has no pawns left on the board, and if that's the case, it returns a score of 0.
+    # If a player has no pawns on the board, he cannot make any more moves, and the game is essentially over for him.
+    # In this case, it doesn't matter what the score is for the other player, because they have already won the game.
+    #    if len(state.cur_pos[current_player]) == 0:
+    #        return 0
+
+    # Checks if the opponent player has any pawns left on the board.
+    # If the opponent has no pawns left, it means that the current player has won, and so the function returns the number of pawns that the current player has on the board as the score.
+    #    if len(state.cur_pos[opp_player]) == 0:
+    #        return len(state.cur_pos[current_player])
+
+
+    opp_player = 1 - self.id
+    us = self.id
+    score = 0
+    for pawn in range(3):
+        score += sum(state.adj_bridges(us, pawn).values())
+        score -= sum(state.adj_bridges(opp_player, pawn).values())
+    #score = sum(sum(state.adj_bridges(opp_player, pawn).values()) for pawn in range(len(state.cur_pos[1])))
+    #print(score)
+    return score
