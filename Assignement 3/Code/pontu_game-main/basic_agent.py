@@ -41,7 +41,7 @@ class MyAgent(AlphaBetaAgent):
   def cutoff(self, state, depth):
       if PontuState.game_over(state):
           return True
-      if depth >= 1:
+      if depth == 2:
           return True
       return False
 
@@ -70,5 +70,5 @@ class MyAgent(AlphaBetaAgent):
     if len(state.cur_pos[opp_player]) == 0:
         return len(state.cur_pos[current_player])
 
-    score = sum(len(state.adj_bridges(opp_player, pawn)) for pawn in range(len(state.cur_pos[1])))
+    #score = sum(len(state.adj_b ridges(opp_player, pawn)) for pawn in range(len(state.cur_pos[1])))
     return score

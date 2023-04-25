@@ -137,6 +137,8 @@ class PontuState(State):
                   from 0 to 4 for vertical bridges)
      - bridge_y : integer indicating the y (ordinate) position of the bridge (from 0 to 4 for horizontal bridges and 
                   from 0 to 3 for vertical bridges)
+                  
+
     
     If the pawns can't move because they are blocked by other pawns but the game isn't over, then the valid actions 
     only consist on removing one bridge. In this case pawn_id and direction will both be equal to None.
