@@ -6,6 +6,11 @@ from pontu_state import PontuState
 """
 Agent skeleton. Fill in the gaps.
 """
+
+class State:
+    def __init__(self):
+        pass
+
 class MyAgent(AlphaBetaAgent):
 
   """
@@ -28,8 +33,6 @@ class MyAgent(AlphaBetaAgent):
           PontuState.apply_action(mov_state, moves)
 
           yield moves, mov_state
-
-
 
   """
   The cutoff function returns true if the alpha-beta/minimax
