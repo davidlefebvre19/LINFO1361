@@ -45,6 +45,7 @@ class State:
 class MyAgent(AlphaBetaAgent):
 
     def __init__(self):
+
         board = (
             set((1, 5)), set((0, 2, 6)), set((1, 3, 7)), set((2, 4, 8)), set((3, 9)),
             set((0, 6, 10)), set((1, 5, 7, 11)), set((2, 6, 8, 12)), set((3, 7, 9, 13)), set((4, 8, 14)),
