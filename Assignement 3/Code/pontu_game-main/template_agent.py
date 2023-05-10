@@ -1,9 +1,12 @@
+import matplotlib.pyplot as plt
+import numpy as np
+
 from agent import AlphaBetaAgent
 import minimax
 from pontu_state import *
 from pontu_state import PontuState
 
-
+SCORES = []
 
 """
 Agent skeleton. Fill in the gaps.
@@ -22,7 +25,7 @@ class MyAgent(AlphaBetaAgent):
   def get_action(self, state, last_action, time_left):
     self.last_action = last_action
     self.time_left = time_left
-    if self.counter_two % 3 == 0:
+    if self.counter_two % 4 == 0:
         self.counter += 1
     self.counter_two += 1
     return minimax.search(state, self, True)
@@ -64,12 +67,20 @@ Possibly a short explanation describing your idea... Go straight to the point!
   """
   def cutoff(self, state: PontuState, depth):
 
+      X = False
+
       if PontuState.game_over(state):
-          return True
+        X = True
 
       if depth == self.counter:
-          return True
-      return False
+        X = True
+
+      if PontuState.game_over(state):
+        plt.hist(SCORES)
+        plt.show()
+        print(np.quantile(SCORES, 0.5))
+
+      return X
 
   """
   The evaluate function must return an integer value
@@ -103,9 +114,11 @@ Possibly a short explanation describing your idea... Go straight to the point!
         score -= sum(state.adj_bridges(opp_player, pawn).values())
         #current_pos = self.cur_pos[opp_player][pawn]
         #score += (current_pos[0] + current_pos[1] - 4)
-
+    SCORES.append(score)
 
     # Indicates the position of the pawns: self.cur_pos[i][j] is the (x,y) position of jth pawn of player i
+    if score <= 5:
+        score = -10000
 
     #score = sum(sum(state.adj_bridges(opp_player, pawn).values()) for pawn in range(len(state.cur_pos[1])))
     #print(score)
