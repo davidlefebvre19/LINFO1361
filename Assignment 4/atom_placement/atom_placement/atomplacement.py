@@ -7,15 +7,14 @@ class AtomPlacement(Problem):
 
     # if you want you can implement this method and use it in the maxvalue and randomized_maxvalue functions
     def successor(self, state):
-        for i in range(len(state.sites) - 1):
-            for j in range(i + 1, len(state.sites) - 1):
-                if state.sites[i] != state.sites[j]:
-                    new_state_sites = state.sites.copy()
-                    new_state_sites[i], new_state_sites[j] = state.sites[j], state.sites[i]
-                    state_to_yield = State(
+        for i, site_i in enumerate(state.sites):
+            for j, site_j in enumerate(state.sites):
+                if i < j and site_i != site_j:
+                    new_state_sites = state.sites[:]
+                    new_state_sites[i], new_state_sites[j] = new_state_sites[j], new_state_sites[i]
+                    yield (i, j), State(
                         state.n_sites, state.n_types, state.edges, state.energy_matrix, sites=new_state_sites
                     )
-                    yield (i, j), state_to_yield
 
 
     # if you want you can implement this method and use it in the maxvalue and randomized_maxvalue functions
@@ -119,3 +118,4 @@ if __name__ == '__main__':
     print(init_state.edges)
     print(init_state.sites)
     print(init_state.n_types)
+    print(node)
