@@ -89,7 +89,7 @@ def maxvalue(problem, limit=100):
     l = limit
     while l > 0:
         frontier = list(current.expand())
-        if frontier != None:
+        if frontier is not None:
             next = frontier[0]
             for node in frontier:
                 if problem.value(node.state) < problem.value(next.state):
