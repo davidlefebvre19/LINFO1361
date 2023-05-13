@@ -88,13 +88,16 @@ def maxvalue(problem, limit=100):
     best = current
     l = limit
     while l > 0:
-        next = current
-        for node in list(next.expand()):
-            if problem.value(node.state) < problem.value(next.state):
-                next = node
-                if problem.value(next.state) < problem.value(best.state):
-                    best = next
-        l -= 1
+        frontier = list(current.expand())
+        if frontier != None:
+            next = frontier[0]
+            for node in frontier:
+                if problem.value(node.state) < problem.value(next.state):
+                    next = node
+            if problem.value(next.state) < problem.value(current.state):
+                current = next
+                if problem.value(current.state) < problem.value(best.state):
+                    best = current
     return best
 
 
