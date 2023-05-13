@@ -85,13 +85,34 @@ def read_instance(instanceFile):
 def maxvalue(problem, limit=100):
     current = LSNode(problem, problem.initial, 0)
     best = current
+    l = limit
+    while l > 0:
+        next = current
+        for node in list(next.expand()):
+            if problem.value(node.state) < problem.value(next.state):
+                next = node
+                if problem.value(next.state) < problem.value(best.state):
+                    best = next
+        l -= 1
+    return best
 
+
+"""
+    l = limit
+    while l >0:
+        current = None
+        for node in list(current.expand()):
+            if problem()
+        
+        l-=1
+    
     front = list(current.expand())
     if front != None:
         for node in front:
             if problem.value(node.state) < problem.value(current.state):
                 best = node
-    return best
+    
+"""
 
 
 # Attention : Depending of the objective function you use, your goal can be to maximize or to minimize it
