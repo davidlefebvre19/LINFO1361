@@ -11,7 +11,7 @@ class AtomPlacement(Problem):
             for j, site_j in enumerate(state.sites):
                 if i < j and site_i != site_j:
                     new_state_sites = state.sites[:]
-                    new_state_sites[i], new_state_sites[j] = new_state_sites[j], new_state_sites[i]
+                    new_state_sites[i], new_state_sites[j] = state.sites[j], state.sites[i]
                     yield (i, j), State(
                         state.n_sites, state.n_types, state.edges, state.energy_matrix, sites=new_state_sites
                     )
@@ -99,6 +99,7 @@ def randomized_maxvalue(problem, limit=100):
     current = LSNode(problem, problem.initial, 0)
     best = current
 
+
     # Put your code here
 
     return best
@@ -114,8 +115,9 @@ if __name__ == '__main__':
     step_limit = 100
     node = maxvalue(ap_problem, step_limit)
     state = node.state
-    print(ap_problem.value(state))
-    print(init_state.edges)
-    print(init_state.sites)
-    print(init_state.n_types)
-    print(node)
+    #print(ap_problem.value(state))
+    #print(init_state.edges)
+    #print(init_state.sites)
+    #print(init_state.n_types)
+    #print(node.state.sites)
+    print (state.__str__())
