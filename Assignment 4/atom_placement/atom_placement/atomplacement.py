@@ -98,6 +98,7 @@ def maxvalue(problem, limit=100):
                 current = next
                 if problem.value(current.state) < problem.value(best.state):
                     best = current
+        l=-1
     return best
 
 
