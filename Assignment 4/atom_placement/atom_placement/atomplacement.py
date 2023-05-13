@@ -6,17 +6,17 @@ from search import *
 class AtomPlacement(Problem):
 
     # if you want you can implement this method and use it in the maxvalue and randomized_maxvalue functions
+
     def successor(self, state):
-        for i in range(len(state.sites)):
-            for j in range(i + 1, len(state.sites)):
-                if state.sites[i] != state.sites[j]:
+        for i, site_i in enumerate(state.sites):
+            for j, site_j in enumerate(state.sites):
+                if i <= j : continue
+                if site_i != site_j:
                     new_state_sites = state.sites[:]
                     new_state_sites[i], new_state_sites[j] = new_state_sites[j], new_state_sites[i]
-                    state_to_yield = State(
+                    yield (i, j), State(
                         state.n_sites, state.n_types, state.edges, state.energy_matrix, sites=new_state_sites
                     )
-                    yield ((i, j), state_to_yield)
-
 
     # if you want you can implement this method and use it in the maxvalue and randomized_maxvalue functions
     def value(self, state):
