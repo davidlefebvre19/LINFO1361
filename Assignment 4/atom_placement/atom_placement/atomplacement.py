@@ -87,8 +87,11 @@ def maxvalue(problem, limit=100):
     current = LSNode(problem, problem.initial, 0)
     best = current
 
-    # Put your code here
-
+    front = list(current.expand())
+    if front != None:
+        for node in front:
+            if problem.value(node.state) < problem.value(current.state):
+                best = node
     return best
 
 
