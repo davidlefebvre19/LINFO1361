@@ -11,7 +11,11 @@ class AtomPlacement(Problem):
 
     # if you want you can implement this method and use it in the maxvalue and randomized_maxvalue functions
     def value(self, state):
-        return None
+        sum = 0
+        for every_atom in state.edges:
+            sum += state.energy_matrix[state.sites[every_atom[0]]][state.sites[every_atom[1]]]
+        return sum
+
 
 
 class State:
@@ -99,4 +103,5 @@ if __name__ == '__main__':
     step_limit = 100
     node = maxvalue(ap_problem, step_limit)
     state = node.state
-    print(state)
+    print(ap_problem.value(state))
+    print(init_state.edges)
