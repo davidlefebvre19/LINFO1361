@@ -1,6 +1,7 @@
 #! /usr/bin/env python3
 """NAMES OF THE AUTHOR(S): Auguste Burlats <auguste.burlats@uclouvain.be>"""
 from search import *
+import random
 
 
 class AtomPlacement(Problem):
@@ -86,19 +87,16 @@ def read_instance(instanceFile):
 def maxvalue(problem, limit=100):
     current = LSNode(problem, problem.initial, 0)
     best = current
-    l = limit
-    while l > 0:
+    for i in range(limit):
         frontier = list(current.expand())
         if frontier is not None:
             next = frontier[0]
             for node in frontier:
                 if problem.value(node.state) < problem.value(next.state):
                     next = node
-            if problem.value(next.state) < problem.value(current.state):
-                current = next
-                if problem.value(current.state) < problem.value(best.state):
-                    best = current
-        l=-1
+            current = next
+            if problem.value(current.state) < problem.value(best.state):
+                best = current
     return best
 
 
@@ -125,9 +123,16 @@ def randomized_maxvalue(problem, limit=100):
     current = LSNode(problem, problem.initial, 0)
     best = current
 
+    for _ in range(limit):
+        frontier = list(current.expand())
+        if frontier:
+            frontier.sort(key=lambda node: problem.value(node.state), reverse=True)
+            best5 = frontier[:min(5, len(frontier))]
 
-    # Put your code here
+            current = random.choice(best5)
 
+            if problem.value(current.state) > problem.value(best.state):
+                best = current
     return best
 
 
@@ -146,5 +151,6 @@ if __name__ == '__main__':
     #print(init_state.sites)
     #print(init_state.n_types)
     #print(node.state.sites)
-    print(node.state.n_sites)
+    #print(node.state.n_sites)
+    #print(ap_problem.value(node.state))
     print (state.__str__())
