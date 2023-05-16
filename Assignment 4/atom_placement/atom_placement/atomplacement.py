@@ -12,7 +12,7 @@ class AtomPlacement(Problem):
             for j, site_j in enumerate(state.sites):
                 if i <= j : continue
                 if site_i != site_j:
-                    new_state_sites = state.sites[:]
+                    new_state_sites = state.sites.copy()
                     new_state_sites[i], new_state_sites[j] = new_state_sites[j], new_state_sites[i]
                     yield (i, j), State(
                         state.n_sites, state.n_types, state.edges, state.energy_matrix, sites=new_state_sites
@@ -146,5 +146,7 @@ if __name__ == '__main__':
     #print(init_state.sites)
     #print(init_state.n_types)
     #print(node.state.sites)
-    print(node.state.n_sites)
+    #print(node.state.n_sites)
+    print(node.value())
+    #print(ap_problem.successor(state))
     print (state.__str__())
