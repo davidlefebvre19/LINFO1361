@@ -100,24 +100,6 @@ def maxvalue(problem, limit=100):
     return best
 
 
-"""
-    l = limit
-    while l >0:
-        current = None
-        for node in list(current.expand()):
-            if problem()
-        
-        l-=1
-    
-    front = list(current.expand())
-    if front != None:
-        for node in front:
-            if problem.value(node.state) < problem.value(current.state):
-                best = node
-    
-"""
-
-
 # Attention : Depending of the objective function you use, your goal can be to maximize or to minimize it
 def randomized_maxvalue(problem, limit=100):
     current = LSNode(problem, problem.initial, 0)
@@ -152,10 +134,7 @@ if __name__ == '__main__':
     #print(init_state.n_types)
     #print(node.state.sites)
     #print(node.state.n_sites)
-<<<<<<< HEAD
     print(node.value())
     #print(ap_problem.successor(state))
-=======
     #print(ap_problem.value(node.state))
->>>>>>> c3e33e62b6f1f1b27b3f34841ca32387e3a2865b
     print (state.__str__())
